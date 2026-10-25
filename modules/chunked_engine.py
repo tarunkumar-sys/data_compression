@@ -216,7 +216,13 @@ def chunked_compress_video(input_path, output_path, codec_params, max_duration=N
     out_ext = os.path.splitext(output_path)[1].lower() or ".mp4"
     in_ext = os.path.splitext(input_path)[1].lower() or ".mp4"
 
-    temp_dir = os.path.join(os.path.dirname(output_path) or ".", f"tmp_chunk_{base_name}_{int(time.time()*1000)%100000}")
+    parent_dir = os.path.dirname(output_path) or "."
+    # Auto-clean any stale tmp_chunk directories from previous interrupted runs
+    for old_tmp in glob.glob(os.path.join(parent_dir, "tmp_chunk_*")):
+        try: shutil.rmtree(old_tmp, ignore_errors=True)
+        except Exception: pass
+
+    temp_dir = os.path.join(parent_dir, f"tmp_chunk_{base_name}_{int(time.time()*1000)%100000}")
     if os.path.exists(temp_dir):
         shutil.rmtree(temp_dir, ignore_errors=True)
     os.makedirs(temp_dir, exist_ok=True)
@@ -353,8 +359,11 @@ def chunked_compress_video(input_path, output_path, codec_params, max_duration=N
         }
 
     finally:
-        # Cleanup temp directory
-        try:
-            shutil.rmtree(temp_dir, ignore_errors=True)
-        except Exception:
-            pass
+        # Cleanup temp directory with retry for Windows file lock release
+        for _ in range(4):
+            try:
+                if os.path.exists(temp_dir):
+                    shutil.rmtree(temp_dir, ignore_errors=False)
+                break
+            except Exception:
+                time.sleep(0.1)
