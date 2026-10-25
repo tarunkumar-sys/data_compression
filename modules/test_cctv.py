@@ -24,26 +24,24 @@ _curr = os.path.abspath(os.path.dirname(__file__))
 if _curr not in sys.path: sys.path.insert(0, _curr)
 
 try:
-    from modules.chunked_engine import chunked_compress_video, get_video_info
+    from modules.chunked_engine import chunked_compress_video, get_video_info, select_module_video
 except ImportError:
-    from chunked_engine import chunked_compress_video, get_video_info
+    from chunked_engine import chunked_compress_video, get_video_info, select_module_video
 
 def test_module():
     os.makedirs("results", exist_ok=True)
-    all_files = list(dict.fromkeys(glob.glob("data/videos/cctv*.mp4") + glob.glob("data/videos/*cctv*") + glob.glob("data/videos/*.mp4")))
-    files = [f for f in all_files if f.lower().endswith(('.mp4','.mkv','.avi','.mov'))]
-    if not files:
+    target_fp = select_module_video("M2")
+    if not target_fp or not os.path.exists(target_fp):
         print("❌ M2: data/videos/ me CCTV clips nahi mili")
         return []
-    cctv_files = [f for f in files if "cctv" in os.path.basename(f).lower()]
-    target_files = cctv_files[:1] if cctv_files else files[:1]
+    target_files = [target_fp]
     
     results = []
     for fp in target_files:
         info = get_video_info(fp)
         dur = info['duration']
         orig = info['size_bytes']
-        bench_t = min(15.0, dur) if dur > 0 else 15.0
+        bench_t = min(10.0, dur) if dur > 0 else 10.0
         base = os.path.splitext(os.path.basename(fp))[0]
         print(f"   📹 Input Clip: {base} ({round(orig/1024, 1)} KB, Testing {bench_t:.0f}s with Dynamic Chunking)")
         

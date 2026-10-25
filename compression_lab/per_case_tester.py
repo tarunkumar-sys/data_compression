@@ -12,7 +12,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 _parent = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if _parent not in sys.path: sys.path.insert(0, _parent)
-from modules.chunked_engine import chunked_compress_video, get_video_info
+from modules.chunked_engine import chunked_compress_video, get_video_info, select_module_video
 
 DATA_DIR = "data" if os.path.exists("data") else "../data"
 RESULTS_DIR = "results" if os.path.exists("results") and not os.path.exists("../results") else ("../results" if os.path.exists("../results") else "results")
@@ -56,9 +56,9 @@ if __name__=="__main__":
                     except Exception as ex:
                         print(f"Skip {name}: {ex}")
         else:
-            video_files = [f for f in files if os.path.getsize(f) < 80 * 1024 * 1024]
-            if not video_files: video_files = files[:1]
-            for fp in video_files[:2]:
+            chosen = select_module_video(case_id, os.path.join(DATA_DIR, "videos"))
+            target_videos = [chosen] if chosen and os.path.exists(chosen) else files[:1]
+            for fp in target_videos:
                 info = get_video_info(fp)
                 dur = info.get('duration', 0.0)
                 bench_t = min(15.0, dur) if dur > 0 else 15.0

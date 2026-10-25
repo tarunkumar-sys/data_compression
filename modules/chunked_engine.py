@@ -50,6 +50,74 @@ def get_video_info(path):
             "error": str(ex)
         }
 
+def select_module_video(module_key, video_dir=None):
+    """
+    Selects a distinct, purpose-suited video for each EduMi module.
+    Prevents all modules from using the same video clip when multiple clips exist.
+    
+    Roles & Keyword priorities:
+    - M2 / cctv: CCTV camera footage ('cctv', 'surveillance', 'cam', 'security', 'cctv1')
+    - M3 / proxy: Editor raw high-res footage ('proxy', '270066', 'raw', '2k', '4k', 'editor')
+    - M4 / final: Final lecture export ('lecture', 'final', 'master', 'export', 'lecture1')
+    - M5 / live: Classroom meeting stream ('class', 'live', 'lowbit', 'rural', 'meeting', 'class1', '7251')
+    """
+    if video_dir is None:
+        video_dir = "data/videos" if os.path.exists("data/videos") else "../data/videos"
+    
+    all_files = glob.glob(os.path.join(video_dir, "*.mp4")) + \
+                glob.glob(os.path.join(video_dir, "*.mkv")) + \
+                glob.glob(os.path.join(video_dir, "*.avi")) + \
+                glob.glob(os.path.join(video_dir, "*.mov"))
+    
+    files = sorted(list(dict.fromkeys(all_files)))
+    if not files:
+        return None
+    
+    key = module_key.lower().strip()
+    
+    # Priority keyword groups
+    priorities = {
+        "m2": ["cctv", "cam", "surveillance", "security"],
+        "cctv": ["cctv", "cam", "surveillance", "security"],
+        "cctv_storage": ["cctv", "cam", "surveillance", "security"],
+        
+        "m3": ["proxy", "270066", "editor_proxy", "2k", "4k", "raw"],
+        "proxy": ["proxy", "270066", "editor_proxy", "2k", "4k", "raw"],
+        "editor_proxy": ["proxy", "270066", "editor_proxy", "2k", "4k", "raw"],
+        
+        "m4": ["lecture", "final", "master", "export", "editor_final"],
+        "final": ["lecture", "final", "master", "export", "editor_final"],
+        "editor_final": ["lecture", "final", "master", "export", "editor_final"],
+        
+        "m5": ["class", "live", "lowbit", "rural", "meeting", "7251"],
+        "live": ["class", "live", "lowbit", "rural", "meeting", "7251"],
+        "live_lowbit": ["class", "live", "lowbit", "rural", "meeting", "7251"],
+    }
+    
+    kw_list = priorities.get(key, [])
+    # 1. Try matching priority keywords
+    for kw in kw_list:
+        matched = [f for f in files if kw in os.path.basename(f).lower()]
+        if matched:
+            return matched[0]
+            
+    # 2. Intelligent index/size-based distribution if no direct keyword matches
+    n = len(files)
+    if n == 1:
+        return files[0]
+        
+    by_size = sorted(files, key=os.path.getsize)
+    if key in ["m2", "cctv", "cctv_storage"]:
+        return files[0]
+    elif key in ["m3", "proxy", "editor_proxy"]:
+        return by_size[-1]  # Largest / highest resolution for proxy test
+    elif key in ["m4", "final", "editor_final"]:
+        return files[1] if n > 2 else files[0]
+    elif key in ["m5", "live", "live_lowbit"]:
+        return by_size[0]  # Smallest / most lightweight for low-bitrate test
+        
+    return files[0]
+
 def calculate_dynamic_plan(info, target_chunk_s=10.0):
     """
     Dynamically determines chunk duration & worker thread count
