@@ -44,8 +44,7 @@ EDUMI_FULL_COMPRESSION_PACKAGE/
 │   ├── test_cctv.py                # M2: CCTV Storage (H.264 vs H.265 vs VP9 via Chunking)
 │   ├── test_editor_proxy.py        # M3: Video Editor Proxy (Fast 360p/480p via Chunking)
 │   ├── test_editor_final.py        # M4: Final Export (Dual H.264 + H.265 via Chunking)
-│   ├── test_live_lowbit.py         # M5: Rural Live Class Low-Bitrate (H.264 vs VP8 vs SVC)
-│   └── test_chunked_compression.py # Benchmark: Sequential vs Dynamic Chunked Parallel Speedup
+│   └── test_live_lowbit.py         # M5: Rural Live Class Low-Bitrate (H.264 vs VP8 vs SVC)
 ├── compression_lab/                # Interactive Lab Benchmarks
 │   ├── image_benchmark.py          # Extended image benchmark (PSNR, time, size)
 │   ├── video_benchmark.py          # General video codec comparison
@@ -126,7 +125,6 @@ python modules/test_cctv.py                # -> results/M2_cctv_results.csv
 python modules/test_editor_proxy.py        # -> results/M3_proxy_results.csv
 python modules/test_editor_final.py        # -> results/M4_final_results.csv
 python modules/test_live_lowbit.py         # -> results/M5_live_results.csv
-python modules/test_chunked_compression.py # -> results/chunked_parallel_benchmark.csv
 ```
 
 ---
@@ -152,7 +150,6 @@ Benchmarks run hone ke baad outputs `results/` directory me generate hote hain:
 - `results/M3_proxy_results.csv`: Proxy video generation speed and file sizes.
 - `results/M4_final_results.csv`: Final video compiler performance.
 - `results/M5_live_results.csv`: Low-bitrate streaming metrics and bitrates.
-- `results/chunked_parallel_benchmark.csv`: Speedup multipliers of dynamic chunked transcoding over sequential encoding.
 
 ---
 
@@ -177,7 +174,7 @@ python integration/apply_best.py
 
 - **Oct 30 (Proposal):** [docs/PROPOSAL.md](docs/PROPOSAL.md)
 - **Nov 20 (Report):** [docs/REPORT_TEMPLATE.md](docs/REPORT_TEMPLATE.md)
-- **Nov 25-29 (Demo):** Live demonstration of `python run_all_modules.py` and `python modules/test_chunked_compression.py`.
+- **Nov 25-29 (Demo):** Live demonstration of `python run_all_modules.py` (M1–M5 with parallel chunking engine).
 
 ---
 
