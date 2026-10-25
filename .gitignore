@@ -1,0 +1,75 @@
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+
+# Environment Variables & Local Settings
+.env
+.env.local
+
+# Databases & Local Storage
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sql
+*.dump
+*.rdb
+
+# IDEs & System Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary Files & Encoding Artifacts
+*.tmp
+*.temp
+*tmp*
+tmp/
+tmp_*/
+
+# Testing Data (Images, Videos & Datasets)
+data/
+data/**
+data/images/
+data/images/**
+data/videos/
+data/videos/**
+compression_lab/data/
+compression_lab/data/**
+
+# Raw Media Files (Videos & Images)
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.webm
+*.flv
+*.wmv
+*.ts
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.avif
+*.bmp
+*.tiff
+*.raw
+
+# Generated Benchmark Results (Keep only directory structure via .gitkeep)
+results/*
+!results/.gitkeep
